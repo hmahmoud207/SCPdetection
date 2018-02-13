@@ -5,6 +5,7 @@ rm(list=ls())
 library(np); library(stats); library(splines); library(gam)
 library(SemiPar); library(KernSmooth); library(locfit); library(lokern); library(lpridge)
 library(pspline); library(sfsmisc)
+
 library(dlnm); library(locpol)
 data(chicagoNMMAPS)
 meantemp=c(); rhum=c(); death=c(); o3=c()
@@ -25,3 +26,4 @@ plot(rhum, death)
 plot(o3, death)
 play=56
 for (i in 1:9){print(c)}
+wow=9
