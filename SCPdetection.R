@@ -137,4 +137,4 @@ for (l in 1:simulation){
   print(Tper)
 }
 p.value13=sum(Tper >= T0)/(simulation); print(p.value13)
-# +++++++++++++++++++++++++
+# +++++++++++++++++++++++++ ==
