@@ -23,3 +23,5 @@ meantemp=Newdata[,1]; rhum=Newdata[,2]; death=Newdata[,3]; o3=Newdata[,4]
 plot(meantemp, death)
 plot(rhum, death)
 plot(o3, death)
+play=56
+for (i in 1:9){print(c)}
