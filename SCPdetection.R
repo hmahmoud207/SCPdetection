@@ -1,11 +1,5 @@
 rm(list=ls())
 library(np); library(stats); library(splines); library(gam)
-library(SemiPar); library(KernSmooth); library(locfit); library(lokern); library(lpridge)
-library(pspline); library(sfsmisc)
-library(dlnm); library(locpol)
-
-rm(list=ls())
-library(np); library(stats); library(splines); library(gam)
 n <- 200
 no.simulation=500
 #Poisson regression coefficients
