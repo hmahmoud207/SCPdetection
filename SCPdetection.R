@@ -71,6 +71,23 @@ print(p.value111)
 #proc.time() - ptm
 
 
+x1=rnorm(100)
+x2=rnorm(100)
+x3=rnorm(100)
+x4=rnorm(100)
+
+y=rpois(100, 1)
+
+my.data=data.frame(y,x1,x2,x3,x4)
+predictors=colnames(my.data[-1])
+target=c("y")
+
+indicators=rbinom(length(predictors), 1, 0.5)
+
+# the more common case
+result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+
+summ=summary(glm(result,data=my.data,family=poisson()))
 
 
 
