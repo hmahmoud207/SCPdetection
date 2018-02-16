@@ -13,7 +13,7 @@ x2 <- runif(n=n, min=0, max=1.5)
 z=x1-0.75; z=z*(z>0)
 
 #compute mu's
-mu <- exp(beta0 + beta1*x1 + beta2*x2+3*z)
+mu <- exp(beta0 + beta1*x1 + beta2*x2 + 3*z)
 #generate Y-values
 y <- rpois(n=n, lambda=mu)
 #data set
@@ -24,13 +24,15 @@ plot(x1,y)
 theta <- seq(from=0, to=1.5, by=0.05); n=length(theta)
 # ----------------------------------------------------
 
+z=matrix(0,200,1)
+z1=matrix(0,200,1)
+
 # Start the clock!
 print("0 vs 1")
-
-my.data=data.frame(y,x1,x2)
+my.data=data.frame(y,x1,z,x2,z1)
 predictors=colnames(my.data[-1])
 target=c("y")
-indicators=c(1,1)
+indicators=c(1,0,1,0,0)
 result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
 fit0=glm(result,data=my.data,family="poisson")
 res0=sum(residuals(fit0)^2) 
@@ -40,10 +42,10 @@ fitted0=fitted(fit0)
 res=c()
 for (i in 1:n){
   z=x1-theta[i]; z=z*(z>0)
-  my.data=data.frame(y,x1,x2,z)
+  my.data=data.frame(y,x1,z,x2,z1)
   predictors=colnames(my.data[-1])
   target=c("y")
-  indicators=c(1,1,1)
+  indicators=c(1,1,1,0)
   result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
   fit1=glm(result,data=my.data,family="poisson")
   res[i]=sum(resid(fit1)^2) 
@@ -55,17 +57,16 @@ print(T0); print(jpSIM)
 
 
 
-
 # ----------- Estimation of PERMUTATED data
 TT=c()
 for (j in 1:no.simulation){
   Ny =fitted0+sample(ResPerm0)
   Ny=Ny*(Ny>0); Ny =cbind(Ny)
   
-  my.data=data.frame(Ny,x1,x2)
+  my.data=data.frame(Ny,x1,z,x2,z1)
   predictors=colnames(my.data[-1])
   target=c("Ny")
-  indicators=c(1,1)
+  indicators=c(1,0,1,0,0)
   result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
   fit00=glm(result, data=my.data,family="poisson")
   res00=sum(residuals(fit00)^2) 
@@ -73,10 +74,10 @@ for (j in 1:no.simulation){
   res11=c()
   for (i in 1:n){
     z=x1-theta[i]; z=z*(z>0)
-    my.data=data.frame(Ny,x1,x2,z)
+    my.data=data.frame(Ny,x1,z,x2,z1)
     predictors=colnames(my.data[-1])
     target=c("Ny")
-    indicators=c(1,1,1)
+    indicators=c(1,1,1,0)
     result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
     fit11=glm(result,data=my.data,family="poisson")
     res11[i]=sum(resid(fit11)^2)
@@ -85,8 +86,20 @@ for (j in 1:no.simulation){
   print(j); print(TT[j])
 }
 TT=c(TT,T0)
-p.value111=sum(TT >= T0)/(no.simulation+1)
+p.value111=sum(TT >= T0)/(no.simulation + 1)
 print(p.value111)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
