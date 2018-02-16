@@ -1,3 +1,103 @@
+# SECOND try
+rm(list=ls())
+library(np); library(stats); library(splines); library(gam)
+n <- 200
+no.simulation=500
+#Poisson regression coefficients
+beta0 <- 3
+beta1 <- 0.5
+beta2 <- 0.5
+beta3 <- 0.5
+#generate covariate values
+x1 <- runif(n=n, min=0, max=1.5)
+x2 <- runif(n=n, min=0, max=1.5)
+x3 <- runif(n=n, min=0, max=1.5)
+z1=x1-0.75; z1=z1*(z1>0)
+z2=x2-0.75; z2=z2*(z2>0)
+
+#compute mu's
+mu <- exp(beta0 + beta1*x1 + beta2*x2 + beta3*x3 + 3*z1 + 2*z2)
+#generate Y-values
+y <- rpois(n=n, lambda=mu)
+#plot(data)
+plot(x1,y)
+plot(x2,y)
+plot(x3,y)
+
+# ----------------------------------------------------
+theta <- seq(from=0, to=1.5, by=0.05); n=length(theta)
+# ----------------------------------------------------
+
+z1=matrix(0,200,1)
+z2=matrix(0,200,1)
+
+
+
+# Start the clock!
+print("0 vs 1")
+my.data=data.frame(y,x1,z1,x2,z2,x3)
+predictors=colnames(my.data[-1])
+target=c("y")
+indicators=c(1,0,1,0,1)
+result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+fit0=glm(result,data=my.data,family="poisson")
+res0=sum(residuals(fit0)^2) 
+ResPerm0=residuals(fit0)
+fitted0=fitted(fit0)
+
+res=c()
+for (i in 1:n){
+  z1=x1-theta[i]; z1=z1*(z1>0)
+  my.data=data.frame(y,x1,z1,x2,z2,x3)
+  predictors=colnames(my.data[-1])
+  target=c("y")
+  indicators=c(1,1,1,0,1)
+  result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+  fit1=glm(result,data=my.data,family="poisson")
+  res[i]=sum(resid(fit1)^2) 
+}
+xx=cbind(theta, res); print(" theta res ")
+jpSIM=xx[which.min(xx[,2]),1] 
+T0=res0/min(res)
+print(T0); print(jpSIM)
+
+
+
+# ----------- Estimation of PERMUTATED data
+TT=c()
+for (j in 1:no.simulation){
+  Ny =fitted0+sample(ResPerm0)
+  Ny=Ny*(Ny>0); Ny =cbind(Ny)
+  
+  my.data=data.frame(Ny,x1,z,x2,z1)
+  predictors=colnames(my.data[-1])
+  target=c("Ny")
+  indicators=c(1,0,1,0,0)
+  result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+  fit00=glm(result, data=my.data,family="poisson")
+  res00=sum(residuals(fit00)^2) 
+  
+  res11=c()
+  for (i in 1:n){
+    z=x1-theta[i]; z=z*(z>0)
+    my.data=data.frame(Ny,x1,z,x2,z1)
+    predictors=colnames(my.data[-1])
+    target=c("Ny")
+    indicators=c(1,1,1,0)
+    result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+    fit11=glm(result,data=my.data,family="poisson")
+    res11[i]=sum(resid(fit11)^2)
+  }
+  TT[j]=res00/min(res11)
+  print(j); print(TT[j])
+}
+TT=c(TT,T0)
+p.value111=sum(TT >= T0)/(no.simulation + 1)
+print(p.value111)
+
+
+
+
 # First try
 rm(list=ls())
 library(np); library(stats); library(splines); library(gam)
