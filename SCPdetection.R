@@ -1,3 +1,133 @@
+# Try 3
+
+rm(list=ls())
+library(np); library(stats); library(splines); library(gam)
+n <- 200
+no.simulation=50
+#Poisson regression coefficients
+beta0 <- 3
+beta1 <- 0.5
+beta2 <- 0.5
+beta3 <- 0.5
+#generate covariate values
+x1 <- runif(n=n, min=0, max=1.5)
+x2 <- runif(n=n, min=0, max=1.5)
+x3 <- runif(n=n, min=0, max=1.5)
+z1=x1-0.75; z1=z1*(z1>0)
+z2=x2-0.75; z2=z2*(z2>0)
+
+#compute mu's
+mu <- exp(beta0 + beta1*x1 + beta2*x2 + beta3*x3 + 3*z1 + 2*z2)
+#generate Y-values
+y <- rpois(n=n, lambda=mu)
+
+# ----------------------------------------------------
+theta <- seq(from=0, to=1.5, by=0.05); n=length(theta)
+# ----------------------------------------------------
+
+for (f in 1:2){
+  if (f==1){indicators=c(1,1,1,1,1,0)}
+  if (f==2){indicators=c(1,1,1,1,1,1)}
+  
+  res=c(); it=0
+  RES=matrix(NA,length(theta)^3,204); FITT=matrix(NA,length(theta)^3,201)
+  for (i in 1:n){
+    z1=x1-theta[i]; z1=z1*(z1>0)
+    
+    for (j in 1:n){
+      z2=x2-theta[j]; z2=z2*(z2>0)
+      
+      for (k in 1:n){
+        z3=x3-theta[k]; z3=z3*(z3>0)
+        
+        it=it+1
+        
+        my.data=data.frame(y,x1,z1,x2,z2,x3,z3)
+        predictors=colnames(my.data[-1])
+        target=c("y")
+        result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+        fit1=glm(result,data=my.data,family="poisson")
+        
+        res[it]=sum(resid(fit1)^2) 
+        RES[it,]=c(residuals(fit1), theta[i], theta[j], theta[k], res[it])
+        FITT[it,]=c(fitted(fit1),res[it]) 
+      }}}
+  
+  if (f==1) {
+    jpSIM1=RES[which.min(RES[,204]),201:203]; print(jpSIM1)
+    ResPerm0=RES[which.min(RES[,204]),1:200]
+    fitted0=FITT[which.min(FITT[,201]),1:200]
+    res0=min(res)} 
+  if (f==2) {
+    jpSIM2=RES[which.min(RES[,204]),201:203]; print(jpSIM2)
+    res1=min(res)} 
+}
+T0=res0/res1
+print(T0)
+
+
+# ----------- PERMUTATION TESTING 
+TT=c()
+for (jj in 1:no.simulation){
+  
+  Ny =fitted0+sample(ResPerm0)
+  Ny=Ny*(Ny>0); Ny =cbind(Ny)
+  
+  
+  for (f in 1:2){
+    if (f==1){indicators=c(1,1,1,1,1,0)}
+    if (f==2){indicators=c(1,1,1,1,1,1)}
+    
+    res=c(); it=0; xx=matrix(NA,length(theta)^3,3)
+    RES=matrix(NA,length(theta)^3,204); FITT=matrix(NA,length(theta)^3,201)
+    for (i in 1:n){
+      z1=x1-theta[i]; z1=z1*(z1>0)
+      
+      for (j in 1:n){
+        z2=x2-theta[j]; z2=z2*(z2>0)
+        
+        for (k in 1:n){
+          z3=x3-theta[j]; z3=z3*(z3>0)
+          
+          it=it+1
+          
+          my.data=data.frame(Ny,x1,z1,x2,z2,x3,z3)
+          predictors=colnames(my.data[-1])
+          target=c("Ny")
+          result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+          fit1=glm(result,data=my.data,family="poisson")
+          
+          res[it]=sum(resid(fit1)^2) 
+          RES[it,]=c(residuals(fit1), theta[i], theta[j], theta[k], res[it])
+          FITT[it,]=c(fitted(fit1),res[it]) 
+        }}}
+    
+    if (f==1) {
+      jpSIM1=RES[which.min(RES[,204]),201:203]; print(jpSIM1)
+      ResPerm0=RES[which.min(RES[,204]),1:200]
+      fitted0=FITT[which.min(FITT[,201]),1:200]
+      res00=min(res)} 
+    if (f==2) {
+      jpSIM2=RES[which.min(RES[,204]),201:203]; print(jpSIM2)
+      res11=min(res)} 
+  }
+  TT[jj]=res00/res11
+  print(jj); print(TT[jj])
+}
+TT=c(TT,T0)
+p.valueF=sum(TT >= T0)/(no.simulation + 1)
+print(p.valueF)
+
+
+
+
+
+
+
+
+
+
+
 # SECOND try
 rm(list=ls())
 library(np); library(stats); library(splines); library(gam)
