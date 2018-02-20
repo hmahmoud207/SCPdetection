@@ -115,16 +115,14 @@ for (jj in 1:no.simulation){# Loop for creating N permuted data sets
   }
   TT[jj]=res00/res11
 }
-TT=c(TT,T0)
-p.valueF=sum(TT >= T0)/(no.simulation + 1); print(p.valueF)
-
+TT=c(TT,T0); p.valueF=sum(TT >= T0)/(no.simulation + 1); print(p.valueF)
 
 if (p.valueF > 0.05) break
 if (sum(indicatorsN)==5) break
 if (p.valueF < 0.05) {indicatorsN[s+3]=1}
 }
 
-# Fitting the final model
+# Declare the Simultaneouschange points detected and fit the final model  
 if (p.valueF>0.05){
     Change.point=jpSIM10; Variable=c("X1","X2","X3")
     print("Simultaneous change points detected are:")
@@ -137,8 +135,39 @@ if (p.valueF>0.05){
     target=c("y")
     result = formula(paste(target, " ~ ", paste(predictors[indicatorsN == 1], collapse = " + ")))
     fitF=glm(result,data=my.data,family="poisson")
-    summary(fitF)
-}
+    summary(fitF)} else {
+      
+      print("Simultaneous change points detected are:")
+      Change.point=jpSIM20; Variable=c("X1","X2","X3")
+      print(data.frame(Variable,Change.point))
+      z1=x1-jpSIM20[1]; z1=z1*(z1>0)
+      z2=x2-jpSIM20[2]; z2=z2*(z2>0)
+      z3=x3-jpSIM20[3]; z3=z3*(z3>0)
+      my.data=data.frame(y,x1,x2,x3,z1,z2,z3)
+      predictors=colnames(my.data[-1])
+      target=c("y")
+      result = formula(paste(target, " ~ ", paste(predictors[indicators == 1], collapse = " + ")))
+      fitF=glm(result,data=my.data,family="poisson")
+      summary(fitF)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if (p.valueF<0.05){
   print("Simultaneous change points detected are:")
