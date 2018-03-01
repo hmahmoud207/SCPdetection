@@ -1,3 +1,11 @@
+# This program detects change point(s) associated with explanatory variable(s) simultaneously, using permutation test algorithm. 
+# A simulated data example is introduced for illustration as follows:
+#   - Three variables are generated from Uniform distribution each with a sample size of n=100. 
+#   - Two change points associated with X1 and X2, each at 0.75. 
+#   - The permutation test is run for 10,000. 
+#   - The response variable y ~ Poisson[mu=exp(beta0 + beta1*x1 + beta2*x2 + beta3*x3 + 3*z1 + 2*z2)],
+#     where z1=[x1-theta1]+ and z2=[x2-theta2]+, and theta1=theta2=0.75
+
 # Libraries needed
 rm(list=ls())
 library(np); library(stats); library(splines); library(gam)
