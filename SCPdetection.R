@@ -4,7 +4,7 @@
 #   - Two change points associated with X1 and X2, each at 0.75. 
 #   - The permutation test is run for 10,000. 
 #   - The response variable y ~ Poisson[mu=exp(beta0 + beta1*x1 + beta2*x2 + beta3*x3 + 3*z1 + 2*z2)],
-#     where z1=[x1-theta1]+ and z2=[x2-theta2]+, and theta1=theta2=0.75
+#     where z1=[x1-theta1]+ and z2=[x2-theta2]+, theta1=theta2=0.75, beta0=3, and beta1=beta2=beta3=0.5
 
 # Libraries needed
 rm(list=ls())
