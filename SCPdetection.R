@@ -1,4 +1,6 @@
-# This program detects change point(s) associated with explanatory variable(s) simultaneously, using permutation test algorithm. 
+# This program detects simultaneous change point(s) associated with explanatory variable(s) as well as using a proposed
+# permutation test algorithm, it examines if the change points are statistically significant or not.
+
 # A simulated data example is introduced for illustration as follows:
 #   - Three variables are generated from Uniform distribution each with a sample size of n=100. 
 #   - Two change points associated with X1 and X2, each at 0.75. 
